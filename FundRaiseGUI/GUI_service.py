@@ -1,5 +1,3 @@
-# gui_service.py
-
 import tkinter as tk
 from tkinter import messagebox
 from FundRaiseLIB import LIB_service

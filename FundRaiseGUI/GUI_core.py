@@ -1,5 +1,3 @@
-# gui_core.py
-
 import tkinter as tk
 from tkinter import messagebox, ttk
 from FundRaiseDAL import DAL_core # Simple DAL calls for display
