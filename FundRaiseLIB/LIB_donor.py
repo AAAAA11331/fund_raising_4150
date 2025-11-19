@@ -1,21 +1,17 @@
 from FundRaiseDAL import DAL_donor
 
-class DonorManager:
-    """Business logic for donor operations (view funds, donate, manage own donations)."""
 
+class DonorManager:
+    """Handles donation transactions and donor-related logic."""
 
     def get_active_funds_list(self):
-        """
-        Fetches active funds for donation.
-        Returns list of (fund_id, description, needed, raised, recipient_name).
-        """
+        """Fetches active funds for donation (list of tuples)."""
+        # Returns list of (fund_id, description, needed, raised, recipient_name)
         return DAL_donor.fetch_active_funds()
 
     def submit_donation(self, fund_description, donation_amount_str,
                         is_anonymous, fund_id_map, donor_user_id):
-        """
-        Validate and submit a donation.
-        """
+        """Validates donation and executes the two-step database transaction."""
         if fund_description not in fund_id_map:
             return False, "Validation Error: Please select a valid active fund."
 
@@ -37,7 +33,6 @@ class DonorManager:
             return True, f"Donation of ${donation_amount:.2f} submitted successfully to Fund ID {fund_id}!"
         else:
             return False, f"Database Error: Failed to submit donation: {db_message}"
-
 
     def get_my_donations(self, donor_user_id):
         """Return this donor's donations."""

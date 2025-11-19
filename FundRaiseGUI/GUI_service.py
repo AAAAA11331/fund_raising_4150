@@ -9,9 +9,11 @@ class ServiceDashboard(tk.Frame):
         self.controller = controller
         self.user_id = user_id
         self.manager = LIB_service.ServiceManager() # LIB initialization
-
+        btn_frame = tk.Frame(self)
+        btn_frame.pack(pady=10)
         tk.Label(self, text="Service Dashboard", font=("Arial", 18, "bold")).pack(pady=10)
-        tk.Button(self, text="Logout", command=controller.logout).pack(pady=10)
+        tk.Button(btn_frame, text="Edit Profile", command=lambda: controller.open_profile()).pack(side=tk.LEFT, padx=6)
+        tk.Button(btn_frame, text="Logout", command=controller.logout).pack(side=tk.LEFT, padx=6)
         
         tk.Label(self, text="Verify Charge for Funds You Are Providing Service For", font=("Arial", 14, "underline")).pack(pady=10)
         
@@ -33,8 +35,8 @@ class ServiceDashboard(tk.Frame):
         tk.Label(form_frame, text="Proof of Charge (URL):").grid(row=1, column=0, padx=5, pady=5, sticky='w')
         self.proof_entry = tk.Entry(form_frame, width=40)
         self.proof_entry.grid(row=1, column=1, padx=5, pady=5, sticky='ew')
-        
-        tk.Button(form_frame, text="Update Proof of Charge", command=self.update_proof, bg='orange', fg='black').grid(row=2, columnspan=2, pady=15)
+
+        tk.Button(form_frame, text="Update Proof of Charge", command=self.update_proof, bg='orange', fg='white').grid(row=2, columnspan=2, pady=15)
         
         self.fund_var.trace_add("write", lambda *args: self.load_current_proof())        
         self.load_funds()

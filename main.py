@@ -1,28 +1,19 @@
 import tkinter as tk
 from tkinter import messagebox
-from FundRaiseGUI.GUI_core import MainWindow, LoginWindow, RegistrationWindow 
+
+from FundRaiseGUI.GUI_core import MainWindow, LoginWindow, RegistrationWindow
 from FundRaiseGUI.GUI_admin import AdminDashboard
 from FundRaiseGUI.GUI_recipient import RecipientDashboard
 from FundRaiseGUI.GUI_donor import DonorDashboard
 from FundRaiseGUI.GUI_service import ServiceDashboard
+from FundRaiseGUI.GUI_profile import ProfileWindow
 
-DASHBOARD_CLASSES = (
-    MainWindow, 
-    LoginWindow, 
-    RegistrationWindow, 
-    AdminDashboard, 
-    RecipientDashboard, 
-    DonorDashboard, 
-    ServiceDashboard
-)
 
 class MainApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Fundraising Project")
-        self.geometry("800x600")
-        
-        self.option_add("*Button.foreground", "black")
+        self.geometry("900x650")
 
         self.user_id = None
         self.user_role = None
@@ -33,12 +24,21 @@ class MainApp(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        
-        for F in DASHBOARD_CLASSES:
+
+        # Initialize all possible frames
+        for F in (
+            MainWindow,
+            LoginWindow,
+            RegistrationWindow,
+            AdminDashboard,
+            RecipientDashboard,
+            DonorDashboard,
+            ServiceDashboard,
+            ProfileWindow,
+        ):
             page_name = F.__name__
-            # Pass user_id=None for dashboards that require it
             if F in (RecipientDashboard, DonorDashboard, ServiceDashboard):
-                frame = F(master=container, controller=self, user_id=None) 
+                frame = F(master=container, controller=self, user_id=None)
             else:
                 frame = F(master=container, controller=self)
 
@@ -48,15 +48,15 @@ class MainApp(tk.Tk):
         self.show_frame(MainWindow)  # Start on the Main Window
 
     def login(self, user_id, user_role):
+        """Called upon successful login. Updates user info and routes to dashboard."""
         self.user_id = user_id
         self.user_role = user_role
 
         # Update user_id in the target frame before showing it
         target_frame_name = user_role + 'Dashboard'
         if user_role in ('Recipient', 'Donor', 'Service'):
-            # The dashboard classes now have their user_id updated before being shown
             self.frames[target_frame_name].user_id = user_id
-        
+
         # Route to the appropriate dashboard, ensuring data is refreshed
         if user_role == 'Admin':
             self.show_frame(AdminDashboard)
@@ -71,22 +71,40 @@ class MainApp(tk.Tk):
             self.show_frame(LoginWindow)
 
     def logout(self):
+        """Resets user state and returns to the Main Window."""
         self.user_id = None
         self.user_role = None
         self.show_frame(MainWindow)
-        
+
+    def open_profile(self):
+        """Open the ProfileWindow for the currently logged-in user."""
+        if not self.user_id:
+            return
+        frame = self.frames.get('ProfileWindow')
+        if frame:
+            frame.user_id = self.user_id
+            frame.user_role = self.user_role
+            try:
+                frame.load_profile()
+            except Exception:
+                pass
+            self.show_frame(ProfileWindow)
+
     def show_frame(self, cont):
+        """Raises the requested frame to the top and reloads data if necessary."""
         frame = self.frames[cont.__name__]
-        
+
         # Data refresh logic for dynamic dashboards
-        if cont.__name__ == 'MainWindow':
+        if cont.__name__ == 'MainWindow' and hasattr(frame, 'load_data'):
             frame.load_data()
         elif cont.__name__ in ('AdminDashboard', 'DonorDashboard', 'ServiceDashboard', 'RecipientDashboard'):
             if hasattr(frame, 'load_funds'):
-                frame.load_funds() 
+                frame.load_funds()
 
         frame.tkraise()
-            
+
+
 if __name__ == "__main__":
     app = MainApp()
     app.mainloop()
+

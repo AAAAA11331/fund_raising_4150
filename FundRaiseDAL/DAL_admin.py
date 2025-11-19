@@ -1,6 +1,9 @@
 from FundRaiseDAL.DAL_core import get_db_connection
 import mysql.connector
 
+# ============================================================
+# Helper Query Functions related to admin role
+# ============================================================
 
 def fetch_unverified_funds():
     """
@@ -29,7 +32,6 @@ def fetch_unverified_funds():
         conn.close()
         return data
     return []
-
 
 def update_fund_verification_status(fund_id: int) -> bool:
     """Updates a fund's is_verified status to TRUE."""
